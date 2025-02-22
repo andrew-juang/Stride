@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 # Load environment variables
 load_dotenv()
 
-router = APIRouter()
+router = APIRouter(prefix="/api")
 
 class Message(BaseModel):
     role: str
@@ -40,7 +40,7 @@ Important guidelines:
 - Include relevant anatomical terms but explain them in lay terms
 - Provide clear, step-by-step instructions when describing exercises
 
-Remember to maintain a professional yet approachable tone, and always prioritize user safety."""
+Remember to maintain a professional yet approachable tone, and always prioritize user safety. Keep it concise"""
 
 @router.post("/chat")
 async def chat(request: ChatRequest):
@@ -62,7 +62,8 @@ async def chat(request: ChatRequest):
             chat = ChatOpenAI(
                 model_name="gpt-3.5-turbo",  # Changed to GPT-3.5 for testing
                 temperature=0.7,
-                openai_api_key=api_key
+                openai_api_key=api_key,
+                max_tokens=150
             )
         except Exception as e:
             logger.error(f"Error initializing ChatOpenAI: {str(e)}")

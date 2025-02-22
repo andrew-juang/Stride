@@ -2,12 +2,17 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { Message } from '@/types/chat';
+import ReactMarkdown from 'react-markdown';
 
 export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: "Hello! I'm your AI Physical Therapist assistant. I can help you with exercise recommendations, injury prevention, and rehabilitation guidance. While I can provide general advice, please remember to consult with a licensed physical therapist for personalized treatment. How can I help you today?"
+      content: "Hello! I'm your AI Physical Therapist assistant. I can help you with:\n\n" +
+        "* Exercise recommendations\n" +
+        "* Injury prevention\n" +
+        "* Rehabilitation guidance\n\n" +
+        "While I can provide general advice, please remember to consult with a licensed physical therapist for personalized treatment. How can I help you today?"
     }
   ]);
   const [input, setInput] = useState('');
@@ -92,7 +97,38 @@ export default function ChatPage() {
                         : 'bg-gray-800/50 text-gray-300'
                     }`}
                   >
-                    {message.content}
+                    <div className="prose prose-invert prose-sm max-w-none">
+                      <ReactMarkdown
+                        components={{
+                          a: ({node, children, ...props}) => (
+                            <a {...props} className="text-blue-400 hover:underline">{children}</a>
+                          ),
+                          ul: ({node, children, ...props}) => (
+                            <ul {...props} className="list-disc list-inside my-2">{children}</ul>
+                          ),
+                          ol: ({node, children, ...props}) => (
+                            <ol {...props} className="list-decimal list-inside my-2">{children}</ol>
+                          ),
+                          h1: ({node, children, ...props}) => (
+                            <h1 {...props} className="text-xl font-bold my-2">{children}</h1>
+                          ),
+                          h2: ({node, children, ...props}) => (
+                            <h2 {...props} className="text-lg font-bold my-2">{children}</h2>
+                          ),
+                          code: ({node, children, ...props}) => (
+                            <code {...props} className="bg-gray-700 rounded px-1">{children}</code>
+                          ),
+                          blockquote: ({node, children, ...props}) => (
+                            <blockquote {...props} className="border-l-4 border-gray-500 pl-4 my-2">{children}</blockquote>
+                          ),
+                          p: ({node, children, ...props}) => (
+                            <p {...props} className="mb-2">{children}</p>
+                          )
+                        }}
+                      >
+                        {message.content}
+                      </ReactMarkdown>
+                    </div>
                   </div>
                 </div>
               ))}
