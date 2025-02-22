@@ -34,3 +34,15 @@ step1 --> step2;
 step2 --> step3;
 step3 --> step4;
 ```
+
+## Challenges
+| Challenges             | Solution |
+|------------------------|----------|
+| Accurate pose tracking |          |
+|                        |          |
+|                        |          |
+|                        |          |
+|                        |          |
+|                        |          |
+
+## Installation & Setup
