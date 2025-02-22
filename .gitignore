@@ -57,3 +57,4 @@ static/
 
 # python venv
 env/
+*.DS_Store
