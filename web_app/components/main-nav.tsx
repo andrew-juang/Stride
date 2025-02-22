@@ -11,7 +11,7 @@ export function MainNav() {
 
   return (
     <header className="bg-background border-b">
-      <div className="container flex h-16 items-center justify-between">
+      <div className="container flex h-16 items-center justify-between ml-8">
         <Link href="/" className="font-bold text-xl">
           Stride
         </Link>
