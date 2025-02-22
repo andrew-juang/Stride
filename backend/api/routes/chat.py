@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 # Load environment variables
 load_dotenv()
 
-router = APIRouter()
+router = APIRouter(prefix="/api")
 
 class Message(BaseModel):
     role: str
