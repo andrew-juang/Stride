@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .api.routes import pose, feedback, chat, auth
+
+from .api import auth
+from .api.routes import pose, feedback, chat
 from .database.connection import engine
 from .database import models
 
@@ -22,7 +24,7 @@ app.add_middleware(
 app.include_router(pose.router, prefix="/pose")
 app.include_router(feedback.router, prefix="/feedback")
 app.include_router(chat.router, prefix="/api")
-app.include_router(auth.router, prefix="/auth")
+app.include_router(auth.router, prefix="/api/auth")
 
 @app.get("/")
 def root():
