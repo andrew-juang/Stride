@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .api.routes import pose, feedback
+from .api.routes import pose, feedback, chat
 
 app = FastAPI()
 
@@ -16,6 +16,7 @@ app.add_middleware(
 # Include routers
 app.include_router(pose.router, prefix="/pose")
 app.include_router(feedback.router, prefix="/feedback")
+app.include_router(chat.router, prefix="/api")
 
 @app.get("/")
 def root():

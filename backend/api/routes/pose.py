@@ -84,7 +84,7 @@ async def estimate_pose(file: UploadFile = File(...)):
         frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
         # Run YOLOv8 inference
-        results = model(frame, conf=0.5)
+        results = model(frame, conf=0.8)
         
         # Extract keypoints
         keypoints_list = []
@@ -107,10 +107,3 @@ async def estimate_pose(file: UploadFile = File(...)):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
-@router.get("/estimate")
-async def test_estimate():
-    """
-    Test endpoint that returns a simple message
-    """
-    return {"message": "Please use POST method to send an image file for pose estimation"}

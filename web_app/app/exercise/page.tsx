@@ -24,7 +24,7 @@ export default function Exercise() {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ 
         video: { 
-          width: { ideal: 640 },
+          width: { ideal: 850 },
           height: { ideal: 480 }
         } 
       });
