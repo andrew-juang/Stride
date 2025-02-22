@@ -216,9 +216,9 @@ export default function Exercise() {
 
   return (
     <div className="container py-8">
-      <h1 className="text-3xl font-bold mb-6 ml-8">Exercise Session</h1>
-      <div className="flex gap-6 ml-8">
-        <div className="w-[65%]">  {/* Video feed container */}
+      <h1 className="text-3xl font-bold mb-6 ml-16">Exercise Session</h1>
+      <div className="flex gap-6 ml-16 mr-4">
+        <div className="w-[65%]">
           <Card>
             <CardHeader>
               <div className="flex justify-between items-center">
@@ -281,7 +281,7 @@ export default function Exercise() {
           </Card>
         </div>
 
-        <div className="w-[30%]">  {/* Feedback container */}
+        <div className="w-[35%]">
           <Card className="h-full">
             <CardHeader>
               <CardTitle>Real-time Feedback</CardTitle>
