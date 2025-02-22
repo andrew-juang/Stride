@@ -5,8 +5,8 @@ from google.auth.transport import requests
 import os
 from dotenv import load_dotenv
 import requests as http_requests
-from ...database import get_db
-from ...models import User
+from ...database.connection import get_db
+from ...database.models import User
 
 load_dotenv()
 

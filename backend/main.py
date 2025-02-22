@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .api.routes import pose, feedback, chat, auth
-from .database import engine
-from . import models
+from .database.connection import engine
+from .database import models
 
 # Create database tables
 models.Base.metadata.create_all(bind=engine)
