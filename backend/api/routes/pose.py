@@ -16,12 +16,12 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Check if model file exists and download if missing
-model_path = "models/yolov8n-pose.pt"
+model_path = "models/yolo11n-pose.pt"
 if not os.path.exists(model_path):
     logger.info(f"Model file not found at {model_path}. Downloading...")
     try:
         # This will automatically download the model
-        model = YOLO('yolov8n-pose.pt')
+        model = YOLO('yolo11n-pose.pt')
         # Save the model to the specified path
         os.makedirs(os.path.dirname(model_path), exist_ok=True)
         model.save(model_path)
@@ -31,7 +31,7 @@ if not os.path.exists(model_path):
         raise
 else:
     model = YOLO(model_path)
-    logger.info("YOLOv8 model loaded successfully")
+    logger.info("YOLO11n model loaded successfully")
 
 def draw_skeleton(frame, results):
     """Draw the skeleton on the frame"""
