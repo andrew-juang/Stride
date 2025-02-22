@@ -189,6 +189,8 @@ export default function Exercise() {
     };
 
     captureAndAnalyze();
+    // Sleep for 1 second to control analysis rate
+    await new Promise(resolve => setTimeout(resolve, 1000));
   };
 
   // Start pose estimation when isExercising changes
