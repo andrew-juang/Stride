@@ -15,31 +15,35 @@ export function MainNav() {
         <Link href="/" className="font-bold text-xl">
           Stride
         </Link>
-        <nav className="flex items-center space-x-4">
-          <Link href="/dashboard">
-            <Button variant="ghost">Dashboard</Button>
-          </Link>
-          <Link href="/exercise">
-            <Button variant="ghost">Exercise</Button>
-          </Link>
-          <Link href="/chat">
-            <Button variant="ghost">Chat</Button>
-          </Link>
-          {user ? (
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <img 
-                  src={user.picture} 
-                  alt={user.name}
-                  className="w-8 h-8 rounded-full"
-                />
-                <span>{user.name}</span>
+        <nav className="flex items-center justify-between flex-1">
+          <div className="flex items-center space-x-4 ml-4">
+            <Link href="/dashboard">
+              <Button variant="ghost">Dashboard</Button>
+            </Link>
+            <Link href="/exercise">
+              <Button variant="ghost">Exercise</Button>
+            </Link>
+            <Link href="/chat">
+              <Button variant="ghost">Chat</Button>
+            </Link>
+          </div>
+          <div className="flex items-center gap-4">
+            {user ? (
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <img 
+                    src={user.picture} 
+                    alt={user.name}
+                    className="w-8 h-8 rounded-full"
+                  />
+                  <span>{user.name}</span>
+                </div>
+                <LogoutButton />
               </div>
-              <LogoutButton />
-            </div>
-          ) : (
-            <LoginButton />
-          )}
+            ) : (
+              <LoginButton />
+            )}
+          </div>
         </nav>
       </div>
     </header>
