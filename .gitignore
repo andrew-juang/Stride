@@ -1,0 +1,56 @@
+# Ignore node_modules and dependencies
+node_modules/
+npm-debug.log
+yarn.lock
+package-lock.json
+
+# Ignore environment variables and sensitive files
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+
+# Ignore build and output directories
+.next/
+out/
+dist/
+
+# Ignore logs
+logs/
+*.log
+*.log.*
+
+# Ignore system files
+.DS_Store
+Thumbs.db
+
+# Ignore Python cache (if using Python scripts)
+__pycache__/
+*.py[cod]
+
+# Ignore virtual environments
+venv/
+.virtualenv/
+
+# Ignore OpenCV cache files (if applicable)
+*.avi
+*.mp4
+*.mov
+*.mkv
+*.webm
+
+# Ignore AI/ML model checkpoints (if applicable)
+models/
+*.pt
+*.h5
+*.onnx
+*.pb
+
+# Ignore Jupyter Notebook checkpoints (if using notebooks)
+.ipynb_checkpoints/
+
+# Ignore frontend build files
+static/
+*.css.map
+*.js.map

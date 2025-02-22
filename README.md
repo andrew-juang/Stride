@@ -1,1 +1,1 @@
-# Stride
+edward stinks
