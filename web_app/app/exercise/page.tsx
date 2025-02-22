@@ -14,7 +14,7 @@ import { useAuth } from "@/components/auth-provider"
 
 export default function Exercise() {
   const [isExercising, setIsExercising] = useState(false)
-  const [feedback, setFeedback] = useState("Select an exercise and click Start Exercise")
+  const [feedback, setFeedback] = useState<string[]>(["Select an exercise and click Start Exercise"])
   const [exerciseType, setExerciseType] = useState("squat")
   const [sessionFeedback, setSessionFeedback] = useState<Set<string>>(new Set())
   const videoRef = useRef<HTMLVideoElement>(null)
@@ -50,7 +50,7 @@ export default function Exercise() {
       }
     } catch (err) {
       console.error("Error accessing webcam:", err);
-      setFeedback("Error accessing webcam. Please make sure you have granted camera permissions.");
+      setFeedback(["Error accessing webcam. Please make sure you have granted camera permissions."]);
     }
   }
 
@@ -112,7 +112,7 @@ export default function Exercise() {
     }
 
     setIsExercising(false)
-    setFeedback("Select an exercise and click Start Exercise")
+    setFeedback(["Select an exercise and click Start Exercise"])
   }
 
   const startPoseEstimation = async () => {
@@ -148,13 +148,14 @@ export default function Exercise() {
         }
 
         const poseData = await poseResponse.json();
-        const imageUrl = `data:image/jpeg;base64,${poseData.image}`;
         
+        // Update pose overlay
         const outputImage = document.getElementById('output-frame') as HTMLImageElement;
         if (outputImage) {
-          outputImage.src = imageUrl;
+          outputImage.src = `data:image/jpeg;base64,${poseData.image}`;
         }
 
+        // Get feedback from API
         const feedbackResponse = await fetch('http://localhost:8000/feedback/analyze', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -177,9 +178,11 @@ export default function Exercise() {
 
       } catch (err) {
         console.error("Error analyzing pose:", err);
-        setFeedback("Error processing video frame");
+        setFeedback(["Error processing video frame"]);
       }
 
+
+      // Continue the loop
       if (isExercising && streamRef.current) {
         animationFrameRef.current = requestAnimationFrame(captureAndAnalyze);
       }
@@ -273,7 +276,16 @@ export default function Exercise() {
             <CardTitle>Real-time Feedback</CardTitle>
           </CardHeader>
           <CardContent>
-            <p>{feedback}</p>
+            <div className="space-y-2">
+              {feedback.map((message, index) => (
+                <div 
+                  key={`${message}-${index}`}
+                  className="p-3 bg-muted rounded-lg border border-border animate-fade-in"
+                >
+                  <p>{message}</p>
+                </div>
+              ))}
+            </div>
           </CardContent>
         </Card>
       </div>
