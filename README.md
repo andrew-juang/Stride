@@ -52,6 +52,10 @@ step3 --> step4;
    cd Stride
    ```
 2. Install the dependencies
+   ```
+   npm install typeScript --save-dev
+   ```
 
 
-## 
+## Contact
+For more information, please contact Andrew Juang at andrewjuang01@gmail.com
