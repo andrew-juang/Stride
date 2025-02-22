@@ -13,7 +13,7 @@ import {
 
 export default function Exercise() {
   const [isExercising, setIsExercising] = useState(false)
-  const [feedback, setFeedback] = useState("Select an exercise and click Start Exercise")
+  const [feedback, setFeedback] = useState<string[]>(["Select an exercise and click Start Exercise"])
   const [exerciseType, setExerciseType] = useState("squat")
   const videoRef = useRef<HTMLVideoElement>(null)
   const streamRef = useRef<MediaStream | null>(null)
@@ -47,7 +47,7 @@ export default function Exercise() {
       }
     } catch (err) {
       console.error("Error accessing webcam:", err);
-      setFeedback("Error accessing webcam. Please make sure you have granted camera permissions.");
+      setFeedback(["Error accessing webcam. Please make sure you have granted camera permissions."]);
     }
   }
 
@@ -65,7 +65,7 @@ export default function Exercise() {
       animationFrameRef.current = undefined
     }
     setIsExercising(false)
-    setFeedback("Select an exercise and click Start Exercise")
+    setFeedback(["Select an exercise and click Start Exercise"])
   }
 
   const startPoseEstimation = async () => {
@@ -122,7 +122,7 @@ export default function Exercise() {
 
       } catch (err) {
         console.error("Error analyzing pose:", err);
-        setFeedback("Error processing video frame");
+        setFeedback(["Error processing video frame"]);
       }
 
       // Only continue if still exercising
@@ -220,7 +220,16 @@ export default function Exercise() {
             <CardTitle>Real-time Feedback</CardTitle>
           </CardHeader>
           <CardContent>
-            <p>{feedback}</p>
+            <div className="space-y-2">
+              {feedback.map((message, index) => (
+                <div 
+                  key={index}
+                  className="p-3 bg-muted rounded-lg border border-border"
+                >
+                  <p>{message}</p>
+                </div>
+              ))}
+            </div>
           </CardContent>
         </Card>
       </div>
