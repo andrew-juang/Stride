@@ -1,6 +1,13 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .api.routes import pose, feedback, chat
+
+from .api import auth
+from .api.routes import chat, exercise, feedback, pose
+from .database.connection import engine
+from .database import models
+
+# Create database tables
+models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
@@ -13,10 +20,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include routers
-app.include_router(pose.router, prefix="/pose")
-app.include_router(feedback.router, prefix="/feedback")
-app.include_router(chat.router, prefix="/api")
+# Include routers with correct prefixes
+app.include_router(chat.router)  # The prefix is now in the router itself
+app.include_router(exercise.router, prefix="/exercise", tags=["exercise"])
+app.include_router(feedback.router, prefix="/feedback", tags=["feedback"])
+app.include_router(pose.router, prefix="/pose", tags=["pose"])
+app.include_router(auth.router, prefix="/api/auth")
 
 @app.get("/")
 def root():
