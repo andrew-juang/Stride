@@ -20,8 +20,8 @@ The Virtual Physiotherapy Assistant is a web-based platform that utilizes AI-pow
 | Backend         | FastAPI                 |
 | Pose Estimation | Yolov11                 |
 | Chatbot AI      | OpenAI GPT              |
-| Database        | Firebase/PostgreSQL     |
-| Deployment      | AWS/Google Cloud/Vercel |
+| Database        | PostgreSQL              |
+
 
 ## System Flow
 ``` mermaid
@@ -36,13 +36,22 @@ step3 --> step4;
 ```
 
 ## Challenges
-| Challenges             | Solution |
-|------------------------|----------|
-| Accurate pose tracking |          |
-|                        |          |
-|                        |          |
-|                        |          |
-|                        |          |
-|                        |          |
+| Challenges             | Solution                                               |
+|------------------------|--------------------------------------------------------|
+| Accurate pose tracking | Adjusted the skeleton model for more accurate tracking |
+|                        |                                                        |
+|                        |                                                        |
+|                        |                                                        |
+|                        |                                                        |
+|                        |                                                        |
 
 ## Installation & Setup
+1. Clone the repository
+   ```
+   git clone https://github.com/andrew-juang/Stride.git
+   cd Stride
+   ```
+2. Install the dependencies
+
+
+## 
