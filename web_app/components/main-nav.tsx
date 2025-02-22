@@ -11,12 +11,9 @@ export function MainNav() {
 
   return (
     <header className="bg-background border-b">
-      <div className="flex h-16 items-center w-full pr-4">
-        <Link href="/" className="flex items-center gap-2 ml-4">
-          <div className="bg-primary w-8 h-8 rounded-lg flex items-center justify-center">
-            <span className="text-primary-foreground font-bold">S</span>
-          </div>
-          <span className="font-bold text-2xl">Stride</span>
+      <div className="container flex h-16 items-center justify-between ml-8">
+        <Link href="/" className="font-bold text-xl">
+          Stride
         </Link>
         <nav className="flex items-center justify-between flex-1">
           <div className="flex items-center space-x-4 ml-4">

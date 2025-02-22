@@ -116,11 +116,11 @@ export default function Exercise() {
   }
 
   const startPoseEstimation = async () => {
-    const captureAndAnalyze = async () => {
-      if (!videoRef.current || !streamRef.current) {
-        stopWebcam();
-        return;
-      }
+    let lastAnalyzeRequest = 0
+    const ANALYZE_INTERVAL = 1000
+
+    const analyzePose = async () => {
+      if (!videoRef.current || !streamRef.current) return;
 
       try {
         const canvas = document.createElement('canvas');
@@ -155,40 +155,45 @@ export default function Exercise() {
           outputImage.src = `data:image/jpeg;base64,${poseData.image}`;
         }
 
-        // Get feedback from API
-        const feedbackResponse = await fetch('http://localhost:8000/feedback/analyze', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            keypoints: poseData.keypoints,
-            exerciseType: exerciseType 
-          }),
-        });
+        // Get feedback
+        const currentTime = Date.now()
+        if (currentTime - lastAnalyzeRequest >= ANALYZE_INTERVAL) {
+          const feedbackResponse = await fetch('http://localhost:8000/feedback/analyze', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+              keypoints: poseData.keypoints,
+              exerciseType: exerciseType 
+            }),
+          });
+          
+          const feedbackData = await feedbackResponse.json();
+          setFeedback(feedbackData.feedback);
 
-        const feedbackData = await feedbackResponse.json();
-        setFeedback(feedbackData.feedback);
-        
-        // Add new feedback to Set if it's meaningful
-        if (feedbackData.feedback && 
+          if (feedbackData.feedback && 
             feedbackData.feedback !== "Error processing video frame" &&
             feedbackData.feedback !== "Select an exercise and click Start Exercise") {
-          console.log("Adding feedback to session:", feedbackData.feedback);
-          setSessionFeedback(prev => new Set([...prev, feedbackData.feedback]));
+            console.log("Adding feedback to session:", feedbackData.feedback);
+            setSessionFeedback(prev => new Set([...prev, feedbackData.feedback]));
+          }
+
+          lastAnalyzeRequest = currentTime;
+        }
+        
+
+        // Continue the loop
+        if (isExercising && streamRef.current) {
+          animationFrameRef.current = requestAnimationFrame(analyzePose);
         }
 
       } catch (err) {
         console.error("Error analyzing pose:", err);
         setFeedback(["Error processing video frame"]);
       }
-
-
-      // Continue the loop
-      if (isExercising && streamRef.current) {
-        animationFrameRef.current = requestAnimationFrame(captureAndAnalyze);
-      }
     };
 
-    captureAndAnalyze();
+    // Start the analysis loop
+    analyzePose();
   };
 
   // Start pose estimation when isExercising changes
@@ -210,84 +215,93 @@ export default function Exercise() {
   }, [isExercising]);
 
   return (
-    <div className="container px-4 md:px-8 mx-auto mt-8">
-      <h1 className="text-3xl font-bold mb-6">Exercise Session</h1>
-      <div className="grid gap-6 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Video Feed</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="mb-4">
-              <Select
-                value={exerciseType}
-                onValueChange={setExerciseType}
-                disabled={isExercising}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select Exercise" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="squat">Squat</SelectItem>
-                  <SelectItem value="lunge">Lunge</SelectItem>
-                  <SelectItem value="armRaise">Arm Raise</SelectItem>
-                  <SelectItem value="pushup">Push-up</SelectItem>
-                  <SelectItem value="plank">Plank</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="aspect-video bg-gray-200 flex items-center justify-center relative overflow-hidden">
-              <video
-                ref={videoRef}
-                autoPlay
-                playsInline
-                muted
-                className="absolute inset-0 w-full h-full object-contain"
-                style={{ 
-                  display: isExercising ? 'block' : 'none',
-                  transform: 'scaleX(-1)' // Mirror the video
-                }}
-              />
-              {isExercising && (
-                <img
-                  id="output-frame"
-                  className="absolute inset-0 w-full h-full object-contain z-10"
-                  alt="Pose Detection"
-                  style={{ transform: 'scaleX(-1)' }} // Mirror the overlay
-                />
-              )}
-              {!isExercising && (
-                <Button onClick={startWebcam}>Start Exercise</Button>
-              )}
-            </div>
-            {isExercising && (
-              <Button 
-                onClick={stopWebcam} 
-                variant="destructive" 
-                className="mt-4"
-              >
-                Stop Exercise
-              </Button>
-            )}
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Real-time Feedback</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              {feedback.map((message, index) => (
-                <div 
-                  key={`${message}-${index}`}
-                  className="p-3 bg-muted rounded-lg border border-border animate-fade-in"
-                >
-                  <p>{message}</p>
+    <div className="container py-8">
+      <h1 className="text-3xl font-bold mb-6 ml-8">Exercise Session</h1>
+      <div className="flex gap-6 ml-8">
+        <div className="w-[65%]">  {/* Video feed container */}
+          <Card>
+            <CardHeader>
+              <div className="flex justify-between items-center">
+                <CardTitle>Video Feed</CardTitle>
+                <div className="w-64">
+                  <Select
+                    value={exerciseType}
+                    onValueChange={setExerciseType}
+                    disabled={isExercising}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select Exercise" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="squat">Squat</SelectItem>
+                      <SelectItem value="lunge">Lunge</SelectItem>
+                      <SelectItem value="armRaise">Arm Raise</SelectItem>
+                      <SelectItem value="pushup">Push-up</SelectItem>
+                      <SelectItem value="plank">Plank</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="aspect-video w-full bg-gray-200 flex items-center justify-center relative overflow-hidden">
+                <video
+                  ref={videoRef}
+                  autoPlay
+                  playsInline
+                  muted
+                  className="absolute inset-0 w-full h-full object-contain"
+                  style={{ 
+                    display: isExercising ? 'block' : 'none',
+                    transform: 'scaleX(-1)'
+                  }}
+                />
+                {isExercising && (
+                  <img
+                    id="output-frame"
+                    className="absolute inset-0 w-full h-full object-contain z-10"
+                    alt="Pose Detection"
+                    style={{ transform: 'scaleX(-1)' }}
+                  />
+                )}
+                {!isExercising && (
+                  <Button onClick={startWebcam}>Start Exercise</Button>
+                )}
+              </div>
+              {isExercising && (
+                <Button 
+                  onClick={stopWebcam} 
+                  variant="destructive" 
+                  className="mt-4"
+                >
+                  Stop Exercise
+                </Button>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="w-[30%]">  {/* Feedback container */}
+          <Card className="h-full">
+            <CardHeader>
+              <CardTitle>Real-time Feedback</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-col gap-2">
+                {feedback.map((message, index) => (
+                  <div 
+                    key={`${message}-${index}`}
+                    className="p-4 bg-muted rounded-lg border border-border animate-fade-in"
+                  >
+                    <p className="text-lg font-medium leading-relaxed">
+                      {message}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   )
