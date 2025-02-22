@@ -13,10 +13,11 @@ def calculate_angle(A, B, C):
     """
     Calculate the angle at joint B using three keypoints.
     """
+    A, B, C = np.array(A[0:2]), np.array(B[0:2]), np.array(C[0:2])
     a = np.linalg.norm(B - C)
     b = np.linalg.norm(A - C)
     c = np.linalg.norm(A - B)
-    return math.degrees(math.acos((b**2 + c**2 - a**2) / (2 * b * c)))
+    return math.degrees(math.acos((a**2 + c**2 - b**2) / (2 * a * c)))
 
 def analyze_squat(keypoints):
     """Analyze squat form using keypoints"""
@@ -31,6 +32,10 @@ def analyze_squat(keypoints):
         rknee_angle = calculate_angle(rhip, rknee, rankle)
         lknee_angle = calculate_angle(lhip, lknee, lankle)
 
+        # if any keypoints are not visible, return ["Unable to analyze squat form. Please ensure your legs are visible."]
+        if any(keypoint[0:2] == [0, 0] for keypoint in [rhip, rknee, rankle, lhip, lknee, lankle]):
+            return ["Unable to analyze squat form. Please ensure your legs are visible."]
+
         # Analyze squat depth
         if rknee_angle < 80 or lknee_angle < 80:
             feedback.append("Your squat is too deep!")
@@ -39,16 +44,27 @@ def analyze_squat(keypoints):
         else:
             feedback.append("Good squat depth!")
 
-        # Check knee alignment
-        if abs(rknee_angle - lknee_angle) > 15:
-            feedback.append("Keep your knees equally bent")
+        # check hip angle
+        rshoulder = keypoints[6]
+        hip_angle = calculate_angle(rshoulder, rhip, [rhip[0], rhip[1] + 100, 0])
+        if hip_angle > 55:
+            feedback.append("Straighten your back")
+        elif hip_angle < 20:
+            feedback.append("Keep your hips up")
+        else:
+            feedback.append("Good hip angle!")
 
         # Check if knees are tracking over toes
-        if any(angle > 170 for angle in [rknee_angle, lknee_angle]):
-            feedback.append("Keep your knees over your toes")
+        shin_angle = calculate_angle(rankle, rknee, [rknee[0], rknee[1] - 100, 0])
+        if shin_angle > 35:
+            feedback.append("Keep your shin vertical")
+        elif shin_angle < 5:
+            feedback.append("Center your shin!")
+        else:
+            feedback.append("Good shin angle!")
 
         return feedback
-    except Exception:
+    except Exception as e:
         return ["Unable to analyze squat form. Please ensure your legs are visible."]
 
 def analyze_lunge(keypoints):
