@@ -54,3 +54,6 @@ models/
 static/
 *.css.map
 *.js.map
+
+# python venv
+env/
