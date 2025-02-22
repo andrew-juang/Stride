@@ -69,16 +69,8 @@ export default function ChatPage() {
 
   return (
     <div className="flex-1 bg-black fixed inset-0 top-16">
-      <div className="flex h-full">
-        {/* Left side - Image placeholder */}
-        <div className="w-1/2 p-4 flex items-center justify-center">
-          <div className="bg-gray-900/50 rounded-lg w-full h-full flex items-center justify-center">
-            <span className="text-gray-500">Image Placeholder</span>
-          </div>
-        </div>
-
-        {/* Right side - Chat */}
-        <div className="w-1/2 p-4">
+      <div className="flex justify-center h-full">
+        <div className="w-[90%] max-w-5xl p-4">
           <div className="bg-gray-900/50 rounded-lg shadow-lg p-4 h-full flex flex-col">
             <div 
               className="flex-1 space-y-4 mb-4 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800"

@@ -210,7 +210,7 @@ export default function Exercise() {
   }, [isExercising]);
 
   return (
-    <div className="container py-8">
+    <div className="container px-4 md:px-8 mx-auto mt-8">
       <h1 className="text-3xl font-bold mb-6">Exercise Session</h1>
       <div className="grid gap-6 md:grid-cols-2">
         <Card>

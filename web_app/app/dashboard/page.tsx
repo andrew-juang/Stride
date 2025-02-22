@@ -42,6 +42,10 @@ export default function Dashboard() {
     }).format(date);
   };
 
+  const capitalizeExercise = (exercise: string) => {
+    return exercise.charAt(0).toUpperCase() + exercise.slice(1);
+  };
+
   if (!user) {
     return (
       <div className="container py-8">
@@ -51,19 +55,19 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="container py-8">
+    <div className="container px-4 md:px-8 mx-auto mt-8">
       <h1 className="text-3xl font-bold mb-6">Your Physiotherapy Dashboard</h1>
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        <Card>
+      <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
+        <Card className="lg:col-span-1">
           <CardHeader>
-            <CardTitle>Exercise Progress</CardTitle>
+            <CardTitle>Exercise History</CardTitle>
           </CardHeader>
           <CardContent>
             {recentSessions.length > 0 ? (
               <div className="space-y-4">
                 {recentSessions.map((session, index) => (
                   <div key={index} className="border-b pb-2">
-                    <p className="font-medium">{session.exercise_type}</p>
+                    <p className="font-medium">{capitalizeExercise(session.exercise_type)}</p>
                     <p className="text-sm text-gray-500">{session.feedback}</p>
                     <p className="text-xs text-gray-400">
                       {formatDate(session.created_at)}
@@ -76,15 +80,7 @@ export default function Dashboard() {
             )}
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Upcoming Sessions</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p>Placeholder for upcoming sessions list</p>
-          </CardContent>
-        </Card>
-        <Card>
+        <Card className="lg:col-span-1">
           <CardHeader>
             <CardTitle>Recent Feedback</CardTitle>
           </CardHeader>
