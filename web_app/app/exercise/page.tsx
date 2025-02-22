@@ -101,13 +101,14 @@ export default function Exercise() {
         }
 
         const poseData = await poseResponse.json();
-        const imageUrl = `data:image/jpeg;base64,${poseData.image}`;
         
+        // Update pose overlay
         const outputImage = document.getElementById('output-frame') as HTMLImageElement;
         if (outputImage) {
-          outputImage.src = imageUrl;
+          outputImage.src = `data:image/jpeg;base64,${poseData.image}`;
         }
 
+        // Get feedback from API
         const feedbackResponse = await fetch('http://localhost:8000/feedback/analyze', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -125,13 +126,12 @@ export default function Exercise() {
         setFeedback(["Error processing video frame"]);
       }
 
-      // Only continue if still exercising
+      // Continue the loop
       if (isExercising && streamRef.current) {
         animationFrameRef.current = requestAnimationFrame(captureAndAnalyze);
       }
     };
 
-    // Start the loop
     captureAndAnalyze();
   };
 
@@ -223,8 +223,8 @@ export default function Exercise() {
             <div className="space-y-2">
               {feedback.map((message, index) => (
                 <div 
-                  key={index}
-                  className="p-3 bg-muted rounded-lg border border-border"
+                  key={`${message}-${index}`}
+                  className="p-3 bg-muted rounded-lg border border-border animate-fade-in"
                 >
                   <p>{message}</p>
                 </div>
