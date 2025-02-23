@@ -23,7 +23,7 @@ class ExerciseSession(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     exercise_type = Column(String)
-    feedback = Column(Text)
+    summary = Column(Text)  # Store only the GPT-generated summary
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     user_email = Column(String, ForeignKey("users.email", ondelete="CASCADE"))
 

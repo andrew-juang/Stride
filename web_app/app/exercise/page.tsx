@@ -11,6 +11,8 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { useAuth } from "@/components/auth-provider"
+import { useRouter } from "next/navigation"
+import { toast } from "@/components/ui/use-toast"
 
 export default function Exercise() {
   const [isExercising, setIsExercising] = useState(false)
@@ -21,6 +23,7 @@ export default function Exercise() {
   const streamRef = useRef<MediaStream | null>(null)
   const animationFrameRef = useRef<number>()
   const { user } = useAuth()
+  const router = useRouter()
 
   // Start webcam feed
   const startWebcam = async () => {
@@ -52,67 +55,6 @@ export default function Exercise() {
       console.error("Error accessing webcam:", err);
       setFeedback(["Error accessing webcam. Please make sure you have granted camera permissions."]);
     }
-  }
-
-  // Stop webcam feed and save session
-  const stopWebcam = async () => {
-    console.log("Stop button clicked");
-    console.log("Current user:", user);
-    console.log("Current feedback:", sessionFeedback);
-
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop())
-      streamRef.current = null
-    }
-    if (videoRef.current) {
-      videoRef.current.srcObject = null
-    }
-    if (animationFrameRef.current) {
-      cancelAnimationFrame(animationFrameRef.current)
-      animationFrameRef.current = undefined
-    }
-
-    // Only save session if we have feedback and user is logged in
-    if (sessionFeedback.size > 0 && user?.email) {
-      try {
-        const uniqueFeedback = Array.from(sessionFeedback).join(" | ");
-        console.log("Sending feedback:", uniqueFeedback);
-
-        const requestData = { 
-          exerciseType,
-          feedback: uniqueFeedback,
-          userEmail: user.email
-        };
-        
-        console.log('Sending session data:', requestData);
-
-        const response = await fetch('http://localhost:8000/exercise/session', {
-          method: 'POST',
-          headers: { 
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(requestData),
-        });
-
-        console.log('Response status:', response.status);
-        const responseData = await response.json();
-        console.log('Response data:', responseData);
-
-        if (!response.ok) {
-          throw new Error(responseData.detail || 'Failed to save session');
-        }
-      } catch (err) {
-        console.error("Error saving exercise session:", err);
-      }
-    } else {
-      console.log('Cannot save session:', {
-        hasFeedback: sessionFeedback.size > 0,
-        isUserLoggedIn: !!user?.email
-      });
-    }
-
-    setIsExercising(false)
-    setFeedback(["Select an exercise and click Start Exercise"])
   }
 
   const startPoseEstimation = async () => {
@@ -206,13 +148,103 @@ export default function Exercise() {
   // Cleanup on unmount
   useEffect(() => {
     return () => {
-      stopWebcam();
+      // Cleanup function
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = undefined;
+      }
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+        streamRef.current = null;
+      }
+      if (videoRef.current) {
+        videoRef.current.srcObject = null;
+      }
     };
   }, []);
 
   useEffect(() => {
     console.log("Output image element exists:", !!document.getElementById('output-frame'));
   }, [isExercising]);
+
+  const stopWebcam = async () => {
+    console.log("Stop button clicked");
+    console.log("Current user:", user);
+    console.log("Current feedback:", sessionFeedback);
+
+    // Clean up resources first
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop())
+      streamRef.current = null
+    }
+    if (videoRef.current) {
+      videoRef.current.srcObject = null
+    }
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current)
+      animationFrameRef.current = undefined
+    }
+
+    // Only save session if we have feedback and user is logged in
+    if (sessionFeedback.size > 0 && user?.email) {
+      try {
+        const uniqueFeedback = Array.from(sessionFeedback).join(" | ");
+        console.log("Sending feedback:", uniqueFeedback);
+
+        const requestData = { 
+          exerciseType,
+          feedback: uniqueFeedback.split(" | "), // Convert to array for backend
+          userEmail: user.email
+        };
+        
+        console.log('Sending session data:', requestData);
+
+        const response = await fetch('http://localhost:8000/exercise/session', {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(requestData),
+        });
+
+        console.log('Response status:', response.status);
+        const responseData = await response.json();
+        console.log('Response data:', responseData);
+
+        if (!response.ok) {
+          throw new Error(responseData.detail || 'Failed to save session');
+        }
+
+        // Show success message
+        toast({
+          title: "Session Completed!",
+          description: "Great work! Your exercise session has been saved.",
+          duration: 3000,
+        });
+
+        // Delay redirect to dashboard
+        setTimeout(() => {
+          router.push('/dashboard');
+        }, 3000);
+
+      } catch (err) {
+        console.error("Error saving exercise session:", err);
+        toast({
+          title: "Error",
+          description: "Failed to save exercise session",
+          variant: "destructive",
+        });
+      }
+    } else {
+      console.log('Cannot save session:', {
+        hasFeedback: sessionFeedback.size > 0,
+        isUserLoggedIn: !!user?.email
+      });
+    }
+
+    setIsExercising(false)
+    setFeedback(["Select an exercise and click Start Exercise"])
+  }
 
   return (
     <div className="container py-8">

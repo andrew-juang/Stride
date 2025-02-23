@@ -5,10 +5,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useAuth } from "@/components/auth-provider";
 import { Message } from "@/types/chat";
 import ReactMarkdown from 'react-markdown';
+import { capitalizeExercise } from "@/lib/utils"
+import { formatDate } from "@/lib/utils"
 
 interface ExerciseSession {
   exercise_type: string;
-  feedback: string;
+  summary: string;
   created_at: string;
 }
 
@@ -25,6 +27,7 @@ export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { user } = useAuth();
+  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -38,33 +41,24 @@ export default function Dashboard() {
     const fetchRecentSessions = async () => {
       if (!user?.email) return;
       
+      setIsLoadingHistory(true);
       try {
         const response = await fetch(`http://localhost:8000/exercise/recent-sessions/${user.email}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch sessions');
+        }
         const data = await response.json();
-        setRecentSessions(data.sessions);
+        setRecentSessions(data.sessions || []);
       } catch (error) {
         console.error('Error fetching recent sessions:', error);
+        setRecentSessions([]);
+      } finally {
+        setIsLoadingHistory(false);
       }
     };
 
     fetchRecentSessions();
   }, [user?.email]);
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return new Intl.DateTimeFormat('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-      hour: 'numeric',
-      minute: 'numeric',
-      hour12: true
-    }).format(date);
-  };
-
-  const capitalizeExercise = (exercise: string) => {
-    return exercise.charAt(0).toUpperCase() + exercise.slice(1);
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -117,27 +111,41 @@ export default function Dashboard() {
 
   return (
     <div className="container px-4 md:px-8 mx-auto mt-8">
-      <h1 className="text-3xl font-bold mb-6">Your Physiotherapy Dashboard</h1>
-      <div className="grid gap-6 grid-cols-1 lg:grid-cols-3">
+      <h1 className="text-3xl font-bold mb-6 ml-16">Your Physiotherapy Dashboard</h1>
+      <div className="grid gap-6 grid-cols-1 lg:grid-cols-3 ml-16">
         <Card className="lg:col-span-1">
           <CardHeader>
             <CardTitle>Exercise History</CardTitle>
           </CardHeader>
           <CardContent>
-            {recentSessions.length > 0 ? (
-              <div className="space-y-4">
+            {isLoadingHistory ? (
+              <div className="flex flex-col items-center justify-center py-8 space-y-4">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                <p className="text-sm text-muted-foreground">Loading exercise history...</p>
+              </div>
+            ) : recentSessions && recentSessions.length > 0 ? (
+              <div className="space-y-6">
                 {recentSessions.map((session, index) => (
-                  <div key={index} className="border-b pb-2">
-                    <p className="font-medium">{capitalizeExercise(session.exercise_type)}</p>
-                    <p className="text-sm text-gray-500">{session.feedback}</p>
-                    <p className="text-xs text-gray-400">
-                      {formatDate(session.created_at)}
+                  <div key={index} className="border rounded-lg p-4 shadow-sm">
+                    <div className="flex justify-between items-start mb-2">
+                      <h3 className="font-semibold text-lg text-primary">
+                        {capitalizeExercise(session.exercise_type)}
+                      </h3>
+                      <span className="text-xs text-muted-foreground">
+                        {formatDate(session.created_at)}
+                      </span>
+                    </div>
+                    <p className="text-sm text-gray-600 leading-relaxed">
+                      {session.summary}
                     </p>
                   </div>
                 ))}
               </div>
             ) : (
-              <p>No recent exercise sessions</p>
+              <div className="text-center py-8 text-muted-foreground">
+                <p>No exercise sessions yet</p>
+                <p className="text-sm mt-2">Complete an exercise to see your history</p>
+              </div>
             )}
           </CardContent>
         </Card>

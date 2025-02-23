@@ -1,96 +1,68 @@
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from ...database.connection import get_db
 from ...database.models import ExerciseSession, User
 from pydantic import BaseModel
 from typing import List
 import logging
-from collections import Counter
+from openai import OpenAI
+import os
+from dotenv import load_dotenv
 
-# Configure logging
+load_dotenv()
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
-
-router = APIRouter()
 
 class SessionCreate(BaseModel):
     exerciseType: str
-    feedback: str
+    feedback: List[str]  # List of feedback messages
     userEmail: str
 
     class Config:
         json_schema_extra = {
             "example": {
                 "exerciseType": "squat",
-                "feedback": "Good form",
+                "feedback": ["Good form", "Keep practicing"],
                 "userEmail": "user@example.com"
             }
         }
 
-def is_meaningful_feedback(feedback: str) -> bool:
-    """Check if feedback is meaningful and not just a camera/visibility message"""
-    skip_phrases = [
-        "try adjusting your position",
-        "make sure you're visible",
-        "no pose detected",
-        "error processing video frame",
-        "select an exercise",
-        "let's make sure you're visible",
-        "cannot see your full body",
-        "move back from the camera",
-        "move closer to the camera",
-        "adjust your position",
-        "camera",
-        "visible"
-    ]
-    
-    feedback_lower = feedback.lower()
-    return not any(phrase in feedback_lower for phrase in skip_phrases)
+def generate_session_summary(exercise_type: str, feedback_list: List[str]) -> str:
+    """Generate a summary of the exercise session using ChatGPT"""
+    try:
+        feedback_text = "\n".join(feedback_list)
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are a helpful physical therapy assistant. Summarize the exercise session feedback in 2-3 encouraging sentences."
+                },
+                {
+                    "role": "user",
+                    "content": f"Exercise: {exercise_type}\nFeedback received during session:\n{feedback_text}\n\nPlease provide a brief, encouraging summary of how this exercise session went."
+                }
+            ],
+            max_tokens=150,
+            temperature=0.7
+        )
+        return response.choices[0].message.content
+    except Exception as e:
+        logger.error(f"Error generating summary: {str(e)}")
+        return "Session completed. Keep practicing to improve your form!"
 
-def summarize_feedback(feedback: str) -> str:
-    """Summarize feedback by removing duplicates, camera messages, and limiting length"""
-    # Split feedback by delimiter
-    feedback_points = [point.strip() for point in feedback.split('|')]
-    
-    # Filter out camera/visibility messages and keep only meaningful feedback
-    meaningful_feedback = [
-        point for point in feedback_points 
-        if point and is_meaningful_feedback(point)
-    ]
-    
-    # Remove duplicates while preserving order
-    unique_feedback = []
-    seen = set()
-    for point in meaningful_feedback:
-        if point not in seen:
-            seen.add(point)
-            unique_feedback.append(point)
-    
-    # Get the most common feedback points (limit to 3)
-    if len(unique_feedback) > 3:
-        # Count occurrences
-        feedback_counter = Counter(meaningful_feedback)
-        # Get the 3 most common feedback points
-        most_common = [point for point, _ in feedback_counter.most_common(3)]
-        return ' | '.join(most_common)
-    
-    return ' | '.join(unique_feedback) if unique_feedback else "Keep practicing!"
+router = APIRouter()
 
 @router.post("/session")
 async def create_session(session: SessionCreate, db: Session = Depends(get_db)):
     try:
-        # Summarize feedback before saving
-        summarized_feedback = summarize_feedback(session.feedback)
+        # Generate summary using ChatGPT
+        summary = generate_session_summary(session.exerciseType, session.feedback)
         
-        # Log the incoming data
-        logger.info(f"Creating session for user {session.userEmail}")
-        logger.info(f"Exercise type: {session.exerciseType}")
-        logger.info(f"Feedback: {summarized_feedback}")
-
-        # Create session directly
+        # Create session with GPT-generated summary
         db_session = ExerciseSession(
             exercise_type=session.exerciseType,
-            feedback=summarized_feedback,  # Use summarized feedback
+            summary=summary,
             user_email=session.userEmail
         )
         
@@ -123,16 +95,13 @@ async def get_recent_sessions(user_email: str, db: Session = Depends(get_db)):
             
         logger.info(f"Found {len(sessions)} sessions")
         
-        # Format the response
-        formatted_sessions = []
-        for session in sessions:
-            formatted_sessions.append({
+        return {
+            "sessions": [{
                 "exercise_type": session.exercise_type,
-                "feedback": session.feedback,  # Already summarized when saved
+                "summary": session.summary,
                 "created_at": session.created_at
-            })
-            
-        return {"sessions": formatted_sessions}
+            } for session in sessions]
+        }
     except Exception as e:
         logger.error(f"Error fetching sessions: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error fetching sessions: {str(e)}") 
