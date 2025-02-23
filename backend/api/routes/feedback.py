@@ -129,7 +129,7 @@ def analyze_arm_raise(keypoints):
         lelbow_angle = calculate_angle(lshoulder, lelbow, lwrist)
         
         # Full shoulder flexion is ~180°
-        elif relbow_angle < 160 or lelbow_angle < 160:
+        if relbow_angle < 160 or lelbow_angle < 160:
             feedback.append("❌ You're getting there! Try reaching a bit higher 💪")
         else:
             feedback.append("✅ Perfect arm extension! Excellent control! ⭐")
