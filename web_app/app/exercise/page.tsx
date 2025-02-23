@@ -117,7 +117,7 @@ export default function Exercise() {
 
   const startPoseEstimation = async () => {
     let lastAnalyzeRequest = 0
-    const ANALYZE_INTERVAL = 1000
+    const ANALYZE_INTERVAL = 1500
 
     const analyzePose = async () => {
       if (!videoRef.current || !streamRef.current) return;
@@ -234,9 +234,7 @@ export default function Exercise() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="squat">Squat</SelectItem>
-                      <SelectItem value="lunge">Lunge</SelectItem>
                       <SelectItem value="armRaise">Arm Raise</SelectItem>
-                      <SelectItem value="pushup">Push-up</SelectItem>
                       <SelectItem value="plank">Plank</SelectItem>
                     </SelectContent>
                   </Select>
