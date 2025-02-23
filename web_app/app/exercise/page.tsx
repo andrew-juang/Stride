@@ -246,7 +246,7 @@ export default function Exercise() {
     }
 
     setIsExercising(false)
-    setFeedback(["Select an exercise and click \"Start Exercise\"."])
+    setFeedback(['Select an exercise and click "Start Exercise".'])
   }
 
   const toggleFeedbackExpand = (index: number) => {
@@ -357,21 +357,6 @@ export default function Exercise() {
                         >
                           <ChevronDown className="h-4 w-4 mr-2" />
                           See {feedback.length - 1} more items
-                        </Button>
-                      )}
-                      
-                      {isLongFeedback && index === feedback.length - 1 && isExpanded && (
-                        <Button
-                          variant="ghost"
-                          className="w-full mt-2 flex items-center justify-center text-muted-foreground hover:text-primary"
-                          onClick={() => {
-                            feedback.slice(1).forEach((_, i) => {
-                              toggleFeedbackExpand(i + 1)
-                            })
-                          }}
-                        >
-                          <ChevronUp className="h-4 w-4 mr-2" />
-                          Show less
                         </Button>
                       )}
                     </div>
