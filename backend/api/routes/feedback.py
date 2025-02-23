@@ -25,14 +25,16 @@ def analyze_squat(keypoints):
         return ["Let's make sure your full body is visible in the camera."]
         
     try:
-        feedback = []
+        feedback = ["❕ Note: Please position yourself so that your side is facing the camera."]
         rhip, rknee, rankle = keypoints[11], keypoints[13], keypoints[15]
         lhip, lknee, lankle = keypoints[12], keypoints[14], keypoints[16]
         rknee_angle = calculate_angle(rhip, rknee, rankle)
         lknee_angle = calculate_angle(lhip, lknee, lankle)
 
+
         if any(keypoint[0:2] == [0, 0] for keypoint in [rhip, rknee, rankle, lhip, lknee, lankle]):
-            return ["Try adjusting your position so I can see your legs better."]
+            feedback.append("Try adjusting your position so I can see your legs better.")
+            return feedback
 
         # Analyze squat depth - adjusted for proper squat form
         # Parallel squat is around 90°, quarter squat ~120°, deep squat ~70°
@@ -46,7 +48,7 @@ def analyze_squat(keypoints):
         # check hip angle - adjusted for proper hip hinge
         # Neutral spine ~45°, excessive forward lean >60°, too upright <30°
         rshoulder = keypoints[6]
-        hip_angle = calculate_angle(rshoulder, rhip, [rhip[0], rhip[1] + 100, 0])
+        hip_angle = calculate_angle(rshoulder, rhip, [rhip[0], rhip[1] - 100, 0])
         if hip_angle > 60:
             feedback.append("❌ Try lifting your chest while keeping your core tight")
         elif hip_angle < 10:
@@ -56,7 +58,7 @@ def analyze_squat(keypoints):
 
         # Check shin angle - adjusted for proper knee tracking
         # Vertical shin is ~0°, forward knee travel ~22-25° is typical
-        shin_angle = calculate_angle(rankle, rknee, [rknee[0], rknee[1] - 100, 0])
+        shin_angle = calculate_angle(rankle, rknee, [rknee[0], rknee[1] + 100, 0])
         if shin_angle > 25:
             feedback.append("❌ Small adjustment needed - try keeping your shins more vertical")
         elif shin_angle < 5:
@@ -85,20 +87,17 @@ def analyze_plank(keypoints):
             return ["Try adjusting your position so I can see your full body better."]
 
         # Check body alignment (should be straight line from shoulders to ankles)
-        body_angle = calculate_angle(shoulder, hip, ankle)
-        if body_angle < 160:
-            feedback.append("❌ Try to keep your body in a straight line from head to heels.")
-        elif body_angle > 195:
-            feedback.append("❌ Your hips are a bit high. Lower them to align with your shoulders and ankles.")
+        leg_angle = calculate_angle(hip, knee, ankle)
+        if leg_angle < 150:
+            feedback.append("❌ Try to keep your legs in a straight line.")
         else:
-            feedback.append("✅ Perfect body alignment! Keep that core tight! 💪")
+            feedback.append("✅ Perfect leg alignment! Keep that core tight! 💪")
 
         # Check hip position (shouldn't sag or pike)
         hip_angle = calculate_angle(shoulder, hip, knee)
-        if hip_angle < 160:
-            feedback.append("❌ Lift your hips slightly to maintain a straight line.")
-        elif hip_angle > 195:
-            feedback.append("❌ Lower your hips a bit to maintain proper form.")
+        feedback.append(f"Hip angle: {hip_angle}")
+        if hip_angle < 145:
+            feedback.append("❌ Adjust your hips slightly to maintain a straight line.")
         else:
             feedback.append("✅ Great hip position! Excellent control! ⭐")
 
