@@ -17,7 +17,7 @@ The Virtual Physiotherapy Assistant is a web-based platform that utilizes AI-pow
 ## Technical Architecture
 | Component       | Technology              |
 |-----------------|-------------------------|
-| Frontend        | TypeScript              |
+| Frontend        | Next.js / Tailwind CSS  |
 | Backend         | FastAPI                 |
 | Pose Estimation | Yolov11                 |
 | Chatbot AI      | OpenAI GPT              |
