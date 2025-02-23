@@ -95,7 +95,6 @@ def analyze_plank(keypoints):
 
         # Check hip position (shouldn't sag or pike)
         hip_angle = calculate_angle(shoulder, hip, knee)
-        feedback.append(f"Hip angle: {hip_angle}")
         if hip_angle < 150:
             feedback.append("❌ Adjust your hips slightly to maintain a straight line.")
         else:
