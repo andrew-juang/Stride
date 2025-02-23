@@ -36,11 +36,11 @@ def generate_session_summary(exercise_type: str, feedback_list: List[str]) -> st
             messages=[
                 {
                     "role": "system",
-                    "content": "You are a helpful physical therapy assistant. Summarize the exercise session feedback in 2-3 encouraging sentences."
+                    "content": "You are a helpful physical therapy assistant. Summarize the exercise session feedback in 1-2 encouraging sentences."
                 },
                 {
                     "role": "user",
-                    "content": f"Exercise: {exercise_type}\nFeedback received during session:\n{feedback_text}\n\nPlease provide a brief, encouraging summary of how this exercise session went."
+                    "content": f"Exercise: {exercise_type}\nFeedback received during session:\n{feedback_text}\n\nPlease provide a brief 1-2 sentence encouraging summary of how this exercise session went."
                 }
             ],
             max_tokens=150,
