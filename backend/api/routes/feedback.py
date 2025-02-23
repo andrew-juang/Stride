@@ -129,17 +129,6 @@ def analyze_arm_raise(keypoints):
         else:
             feedback.append("✅ Perfect arm extension! Excellent control! ⭐")
 
-        # Check shoulder elevation (arms relative to neck)
-        r_shoulder_height = calculate_angle(neck, rshoulder, rwrist)
-        l_shoulder_height = calculate_angle(neck, lshoulder, lwrist)
-        
-        if r_shoulder_height < 80 or l_shoulder_height < 80:
-            feedback.append("❌ Try raising your arms closer to your ears.")
-        elif r_shoulder_height > 100 or l_shoulder_height > 100:
-            feedback.append("❌ Great height! Keep your shoulders relaxed.")
-        else:
-            feedback.append("✅ Perfect shoulder position! 👍")
-
         lhip, rhip = keypoints[12], keypoints[11]
 
         rarm_angle = calculate_angle(relbow, rshoulder, rhip)
