@@ -37,32 +37,32 @@ def analyze_squat(keypoints):
         # Analyze squat depth - adjusted for proper squat form
         # Parallel squat is around 90°, quarter squat ~120°, deep squat ~70°
         if rknee_angle < 70 or lknee_angle < 60:
-            feedback.append("Great depth! Try coming up a bit to protect your knees.")
+            feedback.append("❌ Try coming up a bit to protect your knees.")
         elif rknee_angle > 120 or lknee_angle > 130:
-            feedback.append("You're doing great! Try bending your knees a bit more for better form.")
+            feedback.append("❌ You're doing great! Try bending your knees a bit more for better form.")
         else:
-            feedback.append("Perfect squat depth! Keep it up! 💪")
+            feedback.append("✅ Perfect squat depth! Keep it up! 💪")
 
         # check hip angle - adjusted for proper hip hinge
         # Neutral spine ~45°, excessive forward lean >60°, too upright <30°
         rshoulder = keypoints[6]
         hip_angle = calculate_angle(rshoulder, rhip, [rhip[0], rhip[1] + 100, 0])
         if hip_angle > 60:
-            feedback.append("Try lifting your chest while keeping your core tight")
+            feedback.append("❌ Try lifting your chest while keeping your core tight")
         elif hip_angle < 10:
-            feedback.append("Nice core engagement! Try hinging at your hips a bit more")
+            feedback.append("❌ Nice core engagement! Try hinging at your hips a bit more")
         else:
-            feedback.append("Excellent back position! 👍")
+            feedback.append("✅ Excellent back position! 👍")
 
         # Check shin angle - adjusted for proper knee tracking
         # Vertical shin is ~0°, forward knee travel ~22-25° is typical
         shin_angle = calculate_angle(rankle, rknee, [rknee[0], rknee[1] - 100, 0])
         if shin_angle > 25:
-            feedback.append("Small adjustment needed - try keeping your shins more vertical")
+            feedback.append("❌ Small adjustment needed - try keeping your shins more vertical")
         elif shin_angle < 5:
-            feedback.append("Looking good! Allow your knees to track forward a bit more")
+            feedback.append("❌ Allow your knees to track forward a bit more")
         else:
-            feedback.append("Perfect shin angle - you've got this! ⭐")
+            feedback.append("✅ Perfect shin angle - you've got this! ⭐")
 
         return feedback
     except Exception as e:
@@ -87,20 +87,20 @@ def analyze_plank(keypoints):
         # Check body alignment (should be straight line from shoulders to ankles)
         body_angle = calculate_angle(shoulder, hip, ankle)
         if body_angle < 160:
-            feedback.append("Try to keep your body in a straight line from head to heels.")
+            feedback.append("❌ Try to keep your body in a straight line from head to heels.")
         elif body_angle > 195:
-            feedback.append("Your hips are a bit high. Lower them to align with your shoulders and ankles.")
+            feedback.append("❌ Your hips are a bit high. Lower them to align with your shoulders and ankles.")
         else:
-            feedback.append("Perfect body alignment! Keep that core tight! 💪")
+            feedback.append("✅ Perfect body alignment! Keep that core tight! 💪")
 
         # Check hip position (shouldn't sag or pike)
         hip_angle = calculate_angle(shoulder, hip, knee)
         if hip_angle < 160:
-            feedback.append("Lift your hips slightly to maintain a straight line.")
+            feedback.append("❌ Lift your hips slightly to maintain a straight line.")
         elif hip_angle > 195:
-            feedback.append("Lower your hips a bit to maintain proper form.")
+            feedback.append("❌ Lower your hips a bit to maintain proper form.")
         else:
-            feedback.append("Great hip position! Excellent control! ⭐")
+            feedback.append("✅ Great hip position! Excellent control! ⭐")
 
         return feedback
     except Exception as e:
@@ -126,34 +126,34 @@ def analyze_arm_raise(keypoints):
         
         # Full shoulder flexion is ~180°
         if rarm_angle < 165 or larm_angle < 165:
-            feedback.append("You're getting there! Try reaching a bit higher 💪")
+            feedback.append("❌ You're getting there! Try reaching a bit higher 💪")
         elif rarm_angle > 185 or larm_angle > 185:
-            feedback.append("Great energy! Keep your arms in line with your ears.")
+            feedback.append("❌ Great energy! Keep your arms in line with your ears.")
         else:
-            feedback.append("Perfect arm extension! Excellent control! ⭐")
+            feedback.append("✅ Perfect arm extension! Excellent control! ⭐")
 
         # Check shoulder elevation (arms relative to neck)
         r_shoulder_height = calculate_angle(neck, rshoulder, rwrist)
         l_shoulder_height = calculate_angle(neck, lshoulder, lwrist)
         
         if r_shoulder_height < 80 or l_shoulder_height < 80:
-            feedback.append("Try raising your arms closer to your ears.")
+            feedback.append("❌ Try raising your arms closer to your ears.")
         elif r_shoulder_height > 100 or l_shoulder_height > 100:
-            feedback.append("Great height! Keep your shoulders relaxed.")
+            feedback.append("❌ Great height! Keep your shoulders relaxed.")
         else:
-            feedback.append("Perfect shoulder position! 👍")
+            feedback.append("✅ Perfect shoulder position! 👍")
 
         # Check symmetry between arms
         if abs(rarm_angle - larm_angle) > 10:
-            feedback.append("Looking good! Try to keep both arms at the same height.")
+            feedback.append("❌ Looking good! Try to keep both arms at the same height.")
         elif abs(r_shoulder_height - l_shoulder_height) > 30:
-            feedback.append("Focus on raising both shoulders equally.")
+            feedback.append("❌ Focus on raising both shoulders equally.")
         else:
-            feedback.append("Excellent symmetry between arms! ⭐")
+            feedback.append("✅ Excellent symmetry between arms! ⭐")
 
         return feedback
     except Exception as e:
-        return ["Let's adjust your position so I can see your form better."]
+        return ["❌ Let's adjust your position so I can see your form better."]
 
 @router.post("/analyze")
 async def analyze_pose(data: PoseData):
