@@ -40,11 +40,9 @@ step3 --> step4;
 | Challenges             | Solution                                               |
 |------------------------|--------------------------------------------------------|
 | Accurate pose tracking | Adjusted the skeleton model for more accurate tracking |
-| Documenting Feedback   |                                                        |
+| Documenting Feedback   | Utilized OpenAI for concise and clear feedback formatting                                                       |
 | Early Rep Repetition Misinterpretation                       | Creating a null zone where errors would not be counted                                                    |
-|                        |                                                        |
-|                        |                                                        |
-|                        |                                                        |
+
 
 ## Installation & Setup
 1. Clone the repository
