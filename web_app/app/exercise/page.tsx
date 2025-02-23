@@ -246,7 +246,7 @@ export default function Exercise() {
     }
 
     setIsExercising(false)
-    setFeedback(["Select an exercise and click Start Exercise"])
+    setFeedback(["Select an exercise and click \"Start Exercise\"."])
   }
 
   const toggleFeedbackExpand = (index: number) => {
