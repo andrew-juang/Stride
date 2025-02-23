@@ -1,4 +1,5 @@
-# Virtual Physiotherapy Assistant
+# ![Virtual Physiotherapy Assistant](https://i.imgur.com/k8NPtEZ.gif)
+
 ## Objective
 The Virtual Physiotherapy Assistant is a web-based platform that utilizes AI-powered pose estimation and chatbot support to assist patients in rehabilitation exercises. The system provides real-time feedback, and mental health support to enhance adherence and recovery
 
@@ -53,8 +54,24 @@ step3 --> step4;
    ```
 2. Install the dependencies
    ```
-   npm install typeScript --save-dev
+   cd web_app
+   npm install
+   cd ..
+   pip install -r requirements.txt
    ```
+3. Start the frontend development server
+   ```
+   npm run dev
+   ```
+4. Navigate to the backend and install a Postgresql database
+   ```
+   CREATE DATABASE stride_db;
+   ```
+5. Run the backend
+   ```
+   uvicorn backend.main:app --reload
+   ```
+6. Navigate to http://localhost:3000/
 
 
 ## Contact
