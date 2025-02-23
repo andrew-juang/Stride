@@ -13,6 +13,8 @@ import {
 import { useAuth } from "@/components/auth-provider"
 import { useRouter } from "next/navigation"
 import { toast } from "@/components/ui/use-toast"
+import { ChevronDown, ChevronUp } from "lucide-react"
+import { useState as useExpandState } from "react"
 
 export default function Exercise() {
   const [isExercising, setIsExercising] = useState(false)
@@ -24,6 +26,7 @@ export default function Exercise() {
   const animationFrameRef = useRef<number>()
   const { user } = useAuth()
   const router = useRouter()
+  const [expandedFeedback, setExpandedFeedback] = useExpandState<Record<string, boolean>>({})
 
   // Start webcam feed
   const startWebcam = async () => {
@@ -246,6 +249,13 @@ export default function Exercise() {
     setFeedback(["Select an exercise and click Start Exercise"])
   }
 
+  const toggleFeedbackExpand = (index: number) => {
+    setExpandedFeedback(prev => ({
+      ...prev,
+      [index]: !prev[index]
+    }))
+  }
+
   return (
     <div className="container py-8">
       <h1 className="text-3xl font-bold mb-6 ml-16">Exercise Session</h1>
@@ -318,16 +328,55 @@ export default function Exercise() {
             </CardHeader>
             <CardContent>
               <div className="flex flex-col gap-2">
-                {feedback.map((message, index) => (
-                  <div 
-                    key={`${message}-${index}`}
-                    className="p-4 bg-muted rounded-lg border border-border animate-fade-in"
-                  >
-                    <p className="text-lg font-medium leading-relaxed">
-                      {message}
-                    </p>
-                  </div>
-                ))}
+                {feedback.map((message, index) => {
+                  const isLongFeedback = feedback.length > 1
+                  const shouldCollapse = index >= 1
+                  const isExpanded = expandedFeedback[index]
+
+                  return (
+                    <div key={`${message}-${index}`}>
+                      {(!shouldCollapse || isExpanded) && (
+                        <div 
+                          className="p-4 bg-muted rounded-lg border border-border animate-fade-in"
+                        >
+                          <p className="text-lg font-medium leading-relaxed">
+                            {message}
+                          </p>
+                        </div>
+                      )}
+                      
+                      {isLongFeedback && index === 0 && !isExpanded && (
+                        <Button
+                          variant="ghost"
+                          className="w-full mt-2 flex items-center justify-center text-muted-foreground hover:text-primary"
+                          onClick={() => {
+                            feedback.slice(1).forEach((_, i) => {
+                              toggleFeedbackExpand(i + 1)
+                            })
+                          }}
+                        >
+                          <ChevronDown className="h-4 w-4 mr-2" />
+                          See {feedback.length - 1} more items
+                        </Button>
+                      )}
+                      
+                      {isLongFeedback && index === feedback.length - 1 && isExpanded && (
+                        <Button
+                          variant="ghost"
+                          className="w-full mt-2 flex items-center justify-center text-muted-foreground hover:text-primary"
+                          onClick={() => {
+                            feedback.slice(1).forEach((_, i) => {
+                              toggleFeedbackExpand(i + 1)
+                            })
+                          }}
+                        >
+                          <ChevronUp className="h-4 w-4 mr-2" />
+                          Show less
+                        </Button>
+                      )}
+                    </div>
+                  )
+                })}
               </div>
             </CardContent>
           </Card>
