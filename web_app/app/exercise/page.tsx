@@ -328,40 +328,16 @@ export default function Exercise() {
             </CardHeader>
             <CardContent>
               <div className="flex flex-col gap-2">
-                {feedback.map((message, index) => {
-                  const isLongFeedback = feedback.length > 1
-                  const shouldCollapse = index >= 1
-                  const isExpanded = expandedFeedback[index]
-
-                  return (
-                    <div key={`${message}-${index}`}>
-                      {(!shouldCollapse || isExpanded) && (
-                        <div 
-                          className="p-4 bg-muted rounded-lg border border-border animate-fade-in"
-                        >
-                          <p className="text-lg font-medium leading-relaxed">
-                            {message}
-                          </p>
-                        </div>
-                      )}
-                      
-                      {isLongFeedback && index === 0 && !isExpanded && (
-                        <Button
-                          variant="ghost"
-                          className="w-full mt-2 flex items-center justify-center text-muted-foreground hover:text-primary"
-                          onClick={() => {
-                            feedback.slice(1).forEach((_, i) => {
-                              toggleFeedbackExpand(i + 1)
-                            })
-                          }}
-                        >
-                          <ChevronDown className="h-4 w-4 mr-2" />
-                          See {feedback.length - 1} more items
-                        </Button>
-                      )}
-                    </div>
-                  )
-                })}
+                {feedback.map((message, index) => (
+                  <div 
+                    key={`${message}-${index}`}
+                    className="p-4 bg-muted rounded-lg border border-border animate-fade-in"
+                  >
+                    <p className="text-lg font-medium leading-relaxed">
+                      {message}
+                    </p>
+                  </div>
+                ))}
               </div>
             </CardContent>
           </Card>
